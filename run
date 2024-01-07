@@ -1,0 +1,2 @@
+ansible-playbook --ask-vault-pass local.yml
+

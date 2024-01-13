@@ -6,18 +6,25 @@
     - stow
 - name: Cloning .dotfiles
   ansible.builtin.git:
-    repo: "git@github.com:kodizen/.dotfiles.git"
+    repo: "git@github.com:kodizen/dotfiles.git"
     dest: "{{ lookup('env', 'HOME') }}/.dotfiles"
     recursive: yes
     update: yes
     accept_hostkey: yes
-    version: master
+    version: main
+  become: yes
+  become_user: kodizen
   tags:
     - install
     - dotfiles
     - stow
 - name: Stow dotfiles
-  shell: cd $HOME/.dotfiles && ./ubuntu
+  ansible.builtin.shell:
+    cmd: cd /home/kodizen/.dotfiles && ./ubuntu
+  become: yes
+  become_user: kodizen
+  environment:
+    HOME: /home/kodizen
   tags:
     - install
     - dotfiles

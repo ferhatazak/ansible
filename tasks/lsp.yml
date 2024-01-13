@@ -1,24 +1,38 @@
-- name: Setup sumneko lua lsp
+- name: Setup lua-language-server lua lsp
   ansible.builtin.git:
-    repo: "git@github.com:sumneko/lua-language-server.git"
+    repo: "git@github.com:LuaLS/lua-language-server.git"
     recursive: yes
-    dest: "{{workspace}}/sumneko"
+    dest: "{{ workspace }}/lua-language-server"
+  become: true
+  become_user: kodizen
   tags:
     - install
     - lsp
 
-- name: build the damn sumneko deez lsp
-  ansible.builtin.shell:
-    cmd: ./compile/install.sh
-    chdir: "{{ workspace }}/sumneko/3rd/luamake"
+- name: Print workspace variable
+  debug:
+    msg: "Workspace directory is {{ workspace }}"
+  tags:
+    - install
+    - lsp
+- name: Set correct permissions for lua-language-server directory
+  file:
+    path: "{{ workspace }}/lua-language-server"
+    owner: kodizen
+    group: kodizen
+    recurse: yes
+    mode: "u+rwX,g+rX,o+rX"
+  become: true
+  become_user: kodizen
   tags:
     - install
     - lsp
 
-- name: Finish the dude off with the built
+- name: build the damn lua-language-server deez lsp
+  become: true
   ansible.builtin.shell:
-    cmd: ./3rd/luamake/luamake rebuild
-    chdir: "{{ workspace }}/sumneko/"
+    cmd: ./make.sh
+    chdir: "{{ workspace }}/lua-language-server"
   tags:
     - install
     - lsp

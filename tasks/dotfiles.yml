@@ -1,9 +1,18 @@
-- name: Installing stow
+- name: Installing stow on ubuntu
   apt: name=stow
   tags:
     - install
     - dotfiles
     - stow
+  when: ansible_os_family == "Debian"
+- name: Installing stow on mac
+  become: false
+  homebrew: name=stow
+  tags:
+    - install
+    - dotfiles
+    - stow
+  when: ansible_os_family == "Darwin"
 - name: Cloning .dotfiles
   ansible.builtin.git:
     repo: "git@github.com:kodizen/dotfiles.git"
@@ -20,11 +29,12 @@
     - stow
 - name: Stow dotfiles
   ansible.builtin.shell:
-    cmd: cd /home/kodizen/.dotfiles && ./ubuntu
+    cmd: cd "{{ lookup('env', 'HOME') }}"/.dotfiles && ./ubuntu
+
   become: yes
   become_user: kodizen
   environment:
-    HOME: /home/kodizen
+    HOME: "{{ lookup('env', 'HOME') }}"
   tags:
     - install
     - dotfiles

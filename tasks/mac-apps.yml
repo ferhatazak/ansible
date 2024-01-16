@@ -1,0 +1,12 @@
+tasks:
+  - name: Install Homebrew Cask applications
+    gather_facts: false
+    homebrew_cask:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - brave 
+      - slack
+    tags:
+      - mac
+      - apps

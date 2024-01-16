@@ -1,28 +1,52 @@
-- hosts: localhost
+- name: Configure and Set Up Local Environment
+  hosts: localhost
+  gather_facts: true
   become: true
   vars:
     source_key: "./.ssh/id_rsa"
     dest_key: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa"
     workspace: "{{ lookup('env', 'HOME') }}/workspace"
-  pre_tasks:
-    - name: Update Apt
-      become: true
+
+  tasks:
+    - name: Update APT on Debian systems
       apt:
-        force_apt_get: true
-        update_cache: true
-        state: present
+        name: "*"
+        state: latest
       tags:
         - install
         - core
-  tasks:
-    - include: tasks/ssh.yml
-    - include: tasks/git-setup.yml
-    - include: tasks/core-setup.yml
-    - include: tasks/node-setup.yml
-    - include: tasks/npm-packages.yml
-    - include: tasks/zsh-setup.yml
-    - include: tasks/slack-setup.yml
-    - include: tasks/projects.yml
-    - include: tasks/nvim-setup.yml
-    - include: tasks/dotfiles.yml
-    - include: tasks/productivity-tools.yml
+      when: ansible_distribution == "Debian"
+
+    - name: Include SSH tasks
+      include_tasks: tasks/ssh.yml
+
+    - name: Include Git setup tasks
+      include_tasks: tasks/git-setup.yml
+
+    - name: Include Core setup tasks
+      include_tasks: tasks/core-setup.yml
+
+    - name: Include Node.js setup tasks
+      include_tasks: tasks/node-setup.yml
+
+    - name: Include NPM packages setup tasks
+      include_tasks: tasks/npm-packages.yml
+
+    - name: Include Zsh setup tasks
+      include_tasks: tasks/zsh-setup.yml
+
+    - name: Include Projects setup tasks
+      include_tasks: tasks/projects.yml
+
+    - name: Include Neovim setup tasks
+      include_tasks: tasks/nvim-setup.yml
+
+    - name: Include Dotfiles setup tasks
+      include_tasks: tasks/dotfiles.yml
+
+    - name: Include Productivity tools setup tasks
+      include_tasks: tasks/productivity-tools.yml
+
+    - name: Install Mac Apps
+      include_tasks: tasks/mac-apps.yml
+

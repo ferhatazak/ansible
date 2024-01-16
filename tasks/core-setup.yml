@@ -7,6 +7,7 @@
     - neovim
     - core
 
+  when: ansible_os_family == "Debian"
 - name: Install System Packages 2 (lua, unzip, libtool, libtool-bin, gettext)
   become: true
   apt:
@@ -15,6 +16,7 @@
     - install
     - neovim
     - core
+  when: ansible_distribution == "Debian"
 
 - name: Install System Packages 3 (the rest)
   become: true
@@ -40,6 +42,7 @@
   tags:
     - install
     - core
+  when: ansible_distribution == "Debian"
 
 - name: Install Clang
   become: true
@@ -58,3 +61,5 @@
     - install
     - neovim
     - core
+  when: ansible_distribution == "Debian"
+

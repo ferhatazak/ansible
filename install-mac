@@ -1,0 +1,22 @@
+#!/bin/bash
+
+function check_and_install_homebrew(){
+	if ! command -v brew &> /dev/null
+	then
+		echo "Homevrew not found. Installing Homebrew.."
+
+		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	else
+		echo "Homebrew is installed"
+	fi
+}
+
+function install_ansible(){
+	echo "Installing ansible"
+	brew install ansible
+}
+
+check_and_install_homebrew
+install_ansible
+
+echo "installation complete"

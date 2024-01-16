@@ -1,8 +1,48 @@
+- name: Install dependencies for Neovim on Debian
+  become: true
+  apt:
+    name:
+      - cmake
+      - ninja-build
+      - gettext
+      - libtool
+      - libtool-bin
+      - autoconf
+      - automake
+      - pkg-config
+      - unzip
+      - curl
+      - doxygen
+  when: ansible_os_family == "Debian"
+  tags:
+    - install
+    - neovim
+
+- name: Install dependencies for Neovim on Darwin
+  become_user: kodizen
+  homebrew:
+    name:
+      - cmake
+      - ninja
+      - gettext
+      - libtool
+      - autoconf
+      - automake
+      - pkg-config
+      - unzip
+      - curl
+      - doxygen
+  when: ansible_os_family == "Darwin"
+  tags:
+    - install
+    - neovim
+
 - name: Remove neovim
   shell: rm -rf ~/neovim
   tags:
     - install
     - neovim
+
 - name: Get Packer
   ansible.builtin.git:
     repo: "https://github.com/wbthomason/packer.nvim"
@@ -10,6 +50,7 @@
   tags:
     - install
     - neovim
+
 - name: Clone Neovim
   ansible.builtin.git:
     repo: "https://github.com/neovim/neovim.git"
@@ -17,26 +58,40 @@
   tags:
     - install
     - neovim
+
 - name: Build neovim
   shell: "cd {{ lookup('env', 'HOME') }}/neovim && make -j 20"
   tags:
     - install
     - neovim
+
 - name: Install neovim
   become: true
   shell: "cd {{ lookup('env', 'HOME') }}/neovim && make install"
   tags:
     - install
     - neovim
-- name: Neovim Plugin Development 1
+
+- name: Neovim Plugin Development Dependencies for Debian
   become: true
   apt: name=luarocks
+  when: ansible_os_family == "Debian"
   tags:
     - install
     - neovim
-- name: Neovim Plugin Development 2 luacheck
+
+- name: Neovim Plugin Development Dependencies for Darwin
+  become_user: kodizen
+  homebrew: name=luarocks
+  when: ansible_os_family == "Darwin"
+  tags:
+    - install
+    - neovim
+
+- name: Install luacheck
   become: true
   shell: luarocks install luacheck
   tags:
     - install
     - neovim
+

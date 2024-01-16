@@ -1,6 +1,14 @@
+- name: Check if Node.js is already installed
+  shell: "command -v node && command -v npm"
+  register: node_check
+  changed_when: false
+  ignore_errors: yes
+
 - name: Install n globally
   become: false
   shell: curl -L https://bit.ly/n-install | bash -s -- -y
+  when: node_check.rc != 0
+
   tags:
     - install
     - node
@@ -20,7 +28,8 @@
 - name: Source bashrc and install Node using n
   become: true
   shell: |
-    /home/kodizen/n/bin/n 18
+    {{ lookup('env', 'HOME') }}/n/bin/n 18
   tags:
     - install
     - node
+

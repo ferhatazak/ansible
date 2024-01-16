@@ -1,2 +1,2 @@
-ansible-playbook --ask-vault-pass local.yml
+ansible-playbook --ask-vault-pass --ask-become-pass local.yml
 

@@ -1,24 +1,26 @@
-- name: kdenlive ppa (ppa:kdenlive/kdenlive-stable)
+- name: Add kdenlive PPA (ppa:kdenlive/kdenlive-stable) for Debian
   become: true
   apt_repository:
     repo: ppa:kdenlive/kdenlive-stable
     state: present
     update_cache: True
+  when: ansible_os_family == "Debian"
   tags:
     - install
     - productivity
 
-- name: shutter ppa (ppa:linuxuprising/shutter)
+- name: Add shutter PPA (ppa:linuxuprising/shutter) for Debian
   become: true
   apt_repository:
     repo: ppa:linuxuprising/shutter
     state: present
     update_cache: True
+  when: ansible_os_family == "Debian"
   tags:
     - install
     - productivity
 
-- name: Install packages
+- name: Install packages on Debian
   become: true
   apt:
     name:
@@ -34,6 +36,28 @@
         "ripgrep",
         "shutter",
       ]
+    state: present
+  when: ansible_os_family == "Debian"
   tags:
     - install
     - productivity
+
+- name: Install general packages on Darwin
+  become_user: kodizen
+  homebrew:
+    name:
+      [
+        "tmux",
+        "wireshark",
+        "fzf",
+        "gimp",
+        "tldr",
+        "ripgrep",
+      ]
+    state: present
+  when: ansible_os_family == "Darwin"
+  tags:
+    - install
+    - productivity
+
+

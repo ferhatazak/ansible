@@ -1,24 +1,57 @@
-- name: Download Slack
-  get_url:
-    url: https://downloads.slack-edge.com/linux_releases/slack-desktop-4.19.2-amd64.deb
-    dest: /tmp/slack.deb
+- name: Check if Slack is already installed on Debian
+  command: dpkg -l slack-desktop
+  register: slack_installed_debian
+  failed_when: false
+  changed_when: false
+  when: ansible_distribution == "Debian"
   tags:
     - install
     - slack
 
-- name: Remove Any previous slacks
+- name: Download Slack for Debian
+  get_url:
+    url: https://downloads.slack-edge.com/linux_releases/slack-desktop-4.19.2-amd64.deb
+    dest: /tmp/slack.deb
+  when: ansible_distribution == "Debian" and slack_installed_debian.stdout == ""
+  tags:
+    - install
+    - slack
+
+- name: Remove Any previous Slack versions on Debian
   become: true
   apt:
     name: slack-desktop
     state: absent
+  when: ansible_distribution == "Debian"
   tags:
     - install
     - slack
 
-- name: Install Slack .deb package
+- name: Install Slack .deb package on Debian
   become: true
   apt:
     deb: /tmp/slack.deb
+  when: ansible_distribution == "Debian"
   tags:
     - install
     - slack
+
+- name: Check if Slack is already installed on Darwin
+  command: brew list --versions slack
+  register: slack_installed_darwin
+  failed_when: false
+  changed_when: false
+  when: ansible_distribution == "Darwin"
+  tags:
+    - install
+    - slack
+
+- name: Install Slack on Darwin
+  homebrew:
+    name: slack
+    state: present
+  when: ansible_distribution == "Darwin" and slack_installed_darwin.stdout == ""
+  tags:
+    - install
+    - slack
+

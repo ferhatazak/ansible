@@ -1,26 +1,51 @@
-- name: Install ZSH
-  apt: name=zsh
+- name: Install ZSH on Debian
+  apt:
+    name: zsh
+    state: present
   become: true
   tags: &tags_for_zsh_tasks ["install", "productivity", "dotfiles", "zsh"]
+  when: ansible_distribution == "Debian"
 
-- name: Change shell to zsh
+- name: Install ZSH on macOS
+  homebrew:
+    name: zsh
+    state: present
+  tags:
+    - install
+    - productivity
+    - dotfiles
+    - zsh
+  when: ansible_distribution == "Darwin"
+
+- name: Change shell to ZSH
   shell: chsh -s $(which zsh)
-  tags: *tags_for_zsh_tasks
+  tags:
+    - productivity
+    - dotfiles
+    - zsh
 
-- name: Check that the somefile.conf exists
+- name: Check if Oh-My-Zsh is installed
   stat:
-    path: /home/kodizen/.oh-my-zsh
-  register: oh_my_stats
-  tags: *tags_for_zsh_tasks
+    path: "{{ lookup('env', 'HOME') }}/.oh-my-zsh"
+  register: oh_my_zsh_stats
+  tags:
+    - productivity
+    - dotfiles
+    - zsh
 
-- name: Oh-My-Zsh
-  shell: curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh > ~/.oh-my-installer && chmod +x ~/.oh-my-installer && ~/.oh-my-installer
+- name: Install Oh-My-Zsh
+  shell: >
+    curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh >
+    {{ lookup('env', 'HOME') }}/.oh-my-installer &&
+    chmod +x {{ lookup('env', 'HOME') }}/.oh-my-installer &&
+    {{ lookup('env', 'HOME') }}/.oh-my-installer
+  when: oh_my_zsh_stats.stat.exists == False
+  become_user: "{{ lookup('env', 'USER') }}"
   tags: *tags_for_zsh_tasks
-  when: oh_my_stats.stat.exists == False
-  become_user: kodizen
 
 - name: Install zsh-autosuggestions
   ansible.builtin.git:
     repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
-    dest: "~/.oh-my-zsh/plugins/zsh-autosuggestions"
+    dest: "{{ lookup('env', 'HOME') }}/.oh-my-zsh/plugins/zsh-autosuggestions"
   tags: *tags_for_zsh_tasks
+
